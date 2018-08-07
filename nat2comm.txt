@@ -1,0 +1,16 @@
+
+table_add if_info set_if_info 1 => 1
+table_add if_info set_if_info 2 => 0
+
+table_add smac generate_learn_notify 00:44:00:00:00:00 =>
+table_add smac generate_learn_notify 00:55:00:00:00:00 =>
+
+table_add nat nat_hit_ext_to_int 1 1 192.168.0.10&&&0.0.0.0 192.168.0.1&&&255.255.255.255 80&&&0 20&&&0xffff => 10.0.0.10 20 1
+table_add nat nat_hit_int_to_ext 1 1 10.0.0.10&&&255.255.255.255 0.0.0.0&&&0.0.0.0 20&&&0xffff 0&&&0 => 192.168.0.1 1025 1
+
+table_add ipv4_lpm set_nhop 10.0.0.10/32 => 1 
+table_add ipv4_lpm set_nhop 192.168.0.10/32 => 2
+
+table_add sendout rewrite_src_mac 1 => 00:aa:bb:00:00:01
+table_add sendout rewrite_src_mac 2 => 00:aa:bb:00:00:02
+

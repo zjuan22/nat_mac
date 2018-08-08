@@ -1,3 +1,18 @@
+// Copyright 2018 INTRIG/FEEC/UNICAMP (University of Campinas), Brazil
+//author: Juan Mejia -  email: zjuan22@gmail.com 
+//Licensed under the Apache License, Version 2.0 (the "License");
+//you may not use this file except in compliance with the License.
+//You may obtain a copy of the License at
+//
+//    http://www.apache.org/licenses/LICENSE-2.0
+//
+//Unless required by applicable law or agreed to in writing, software
+//distributed under the License is distributed on an "AS IS" BASIS,
+//WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//See the License for the specific language governing permissions and
+//limitations under the License.
+
+
 #include "controller.h"
 #include "messages.h"
 #include <unistd.h>
@@ -12,8 +27,9 @@
 	uint8_t macs[MAX_MACS][6];
 	uint8_t portmap[MAX_MACS];
 	uint8_t ips[MAX_MACS][4];
+	uint8_t ips_new[MAX_MACS][4];
 	uint8_t ipd[MAX_MACS][4];
-	uint8_t stcp_txt[MAX_MACS];
+        uint8_t stcp_txt[MAX_MACS][2];
 
 	int mac_count = -1;
 
@@ -23,8 +39,8 @@
 		int values[6];
 		int values_ip[4];
 		int values_ip2[4];
+	        int values_stcp[2];
 		int port;
-		int values_stcp;
 		int i;
 
 		f = fopen(filename, "r");
@@ -38,7 +54,7 @@
 						&values[3], &values[4], &values[5],
 						&values_ip[0], &values_ip[1], &values_ip[2], &values_ip[3],
 						&values_ip2[0], &values_ip2[1], &values_ip2[2], &values_ip2[3],
-						&values_stcp,
+						&values_stcp[1],
 						&port
 			) )
 			{
@@ -55,7 +71,15 @@
 					ips[mac_count][i] = (uint8_t) values_ip[i];
 				for( i = 0; i < 4; ++i )
 					ipd[mac_count][i] = (uint8_t) values_ip2[i];
-				stcp_txt[mac_count] = (uint8_t) values_stcp;
+                                // This is for the new src IP... provisional 
+                                ips_new[mac_count][0] = (uint8_t) values_ip2[3];
+                                ips_new[mac_count][1] = (uint8_t) values_ip2[2];
+                                ips_new[mac_count][2] = (uint8_t) values_ip2[1];
+                                ips_new[mac_count][3] = (uint8_t) values_ip2[0];
+  
+			        stcp_txt[mac_count][1] = (uint8_t) values_stcp[1];
+			        stcp_txt[mac_count][0] = 0;
+
 				portmap[mac_count] = (uint8_t) port;
 	
 
@@ -232,7 +256,7 @@
 
 	}
 
-	void fill_nat_up(uint8_t ip_inn[4], uint8_t ip[4], uint8_t srctcp[2])
+	void fill_nat_up(uint8_t ip_inn[4], uint8_t ip[4], uint8_t srctcp)
 	{
 		char buffer[2048];
 		struct p4_header* h;
@@ -275,9 +299,15 @@
 	    //    printf("\n");
 
 
+		//ap2 = add_p4_action_parameter(h, a, 2048);
+		//strcpy(ap2->name, "srcPort");
+		//memcpy(ap2->bitmap, srctcp, 2);
+		//ap2->length = 2*8+0;
+
 		ap2 = add_p4_action_parameter(h, a, 2048);
 		strcpy(ap2->name, "srcPort");
-		memcpy(ap2->bitmap, srctcp, 2);
+		ap2->bitmap[0] = srctcp;
+		ap2->bitmap[1] = 0;
 		ap2->length = 2*8+0;
 
 	      //  printf("%s ->", ap2->name);
@@ -527,13 +557,15 @@
         for (i=0;i<=mac_count;++i)
         {
 
-               printf("\n Filling tables smac/decap/nat_up/lpm_up MAC: %02x:%02x:%02x:%02x:%02x:%02x src_IP: %d.%d.%d.%d dst_IP: %d.%d.%d.%d srcTcpPort %d port %d \n", macs[i][0],macs[i][1],macs[i][2],macs[i][3],macs[i][4],macs[i][5], ips[i][0],ips[i][1],ips[i][2],ips[i][3] , ipd[i][0],ipd[i][1],ipd[i][2],ipd[i][3], stcp_txt[i], portmap[i] );
+               printf("\n Filling tables smac/decap/nat_up/lpm_up MAC: %02x:%02x:%02x:%02x:%02x:%02x src_IP: %d.%d.%d.%d dst_IP: %d.%d.%d.%d srcTcpPort %d port %d \n", macs[i][0],macs[i][1],macs[i][2],macs[i][3],macs[i][4],macs[i][5], ips[i][0],ips[i][1],ips[i][2],ips[i][3] , ipd[i][0],ipd[i][1],ipd[i][2],ipd[i][3], stcp_txt[i][1], portmap[i] );
 
 
                fill_smac(macs[i]);  // esta smac del paquete
                //printf("inside sleep first \n");
                //sleep(1);
-               fill_nat_up(ips[i],ipd[i],dtcp); //
+               //fill_nat_up(ips[i],ipd[i],dtcp); //
+                
+               fill_nat_up(ips[i],ips_new[i],stcp_txt[i][1]); //
                //fill_nat_up(ips[i],ip2,stcp_txt[i]); //
                //printf("inside sleep two \n");
                //sleep(1);
@@ -548,15 +580,17 @@
 
                if(0 == (i%500)){ printf("inside sleep \n");sleep(1);;}
                //printf("inside sleep \n");
-
+               usleep(2000);
 
                //sleep(1);
         }
 
 
+	printf ("ctrl Total entries sent %d\n",i);
 
+        sleep(1);
 
-         printf("\n");
+        printf("\n");
 
  }
 

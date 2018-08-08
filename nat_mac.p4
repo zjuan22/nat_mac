@@ -122,11 +122,11 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
     @name(".natTcp_learn") action natTcp_learn() {
         digest<natTcp_learn_digest>((bit<32>)1025, { hdr.ipv4.srcAddr, hdr.tcp.srcPort });
     }
-    /*@name(".nat_hit_int_to_ext") action nat_hit_int_to_ext(bit<32> srcAddr, bit<16> srcPort) {*/ 
+    @name(".nat_hit_int_to_ext") action nat_hit_int_to_ext(bit<32> srcAddr, bit<16> srcPort) { 
     /*precisa adicionar srcPort????*/
-    @name(".nat_hit_int_to_ext") action nat_hit_int_to_ext(bit<32> srcAddr) {
+    /*@name(".nat_hit_int_to_ext") action nat_hit_int_to_ext(bit<32> srcAddr) {*/
         hdr.ipv4.srcAddr= srcAddr;
-        /*hdr.tcp.srcPort = srcPort;*/
+        hdr.tcp.srcPort = srcPort;
     }
 
     @name(".nat_up") table nat_up {
@@ -137,10 +137,10 @@ control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_
         default_action = natTcp_learn();     
     }
 
-    /*@name(".nat_hit_ext_to_int") action nat_hit_ext_to_int(bit<32> dstAddr, bit<16> dstPort) {*/
-    @name(".nat_hit_ext_to_int") action nat_hit_ext_to_int(bit<32> dstAddr) {
+    @name(".nat_hit_ext_to_int") action nat_hit_ext_to_int(bit<32> dstAddr, bit<16> dstPort) {
+    /*@name(".nat_hit_ext_to_int") action nat_hit_ext_to_int(bit<32> dstAddr) {*/
         hdr.ipv4.dstAddr = dstAddr;
-        /*hdr.tcp.dstPort = dstPort; */
+        hdr.tcp.dstPort = dstPort; 
     }
     @name(".nat_dw") table nat_dw {
         actions = { drop; nat_hit_ext_to_int;  }

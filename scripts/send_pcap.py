@@ -11,7 +11,7 @@ from scapy.all import Ether, IP, IPv6, TCP, ICMP, GRE
 from scapy.utils import rdpcap
 
 #repo_dir='/home/messer/workarea/myrepo/PCAP/'
-repo_dir='/mnt/c/Users/zjuan/Documents/workarea/topicos_sistemas/nat_mac'
+repo_dir='/home/lion/workspace/nat_mac/nat_pcaps/'
 
 NUM_PACKETS = 1 
 parser = argparse.ArgumentParser(description='run_test.py')
@@ -123,12 +123,12 @@ for p, iface in port_map.items():
 send_socket = socket.socket(socket.AF_PACKET, socket.SOCK_RAW,
 		socket.htons(0x03))
 
-if args.dl:
-    pcaps=rdpcap(repo_dir+"")
+if args.ul:
+    pcaps=rdpcap(repo_dir+"nat_ul_100_entries/nfpa.trPR_tcp_100_random.128bytes.pcap")
+    pcaps=rdpcap(repo_dir+"PCAP/nfpa.trPR_tcp_10000_random.128bytes.pcap")
     port2send = port_map[1]
-elif args.ul:
-    #pcaps=rdpcap("nfpa.trPR_bng_ul_100_random.128bytes.pcap")
-    pcaps=rdpcap(repo_dir+"nat_ul_pcap/nfpa.trPR_tcp_100_random.64bytes.pcap")
+elif args.dl:
+    pcaps=rdpcap(repo_dir+"nat_dl_100_entries/nfpa.trPR_nat_dl_100_random.128bytes.pcap")
     port2send = port_map[1]
 
 else:
@@ -137,7 +137,7 @@ else:
 send_socket.bind((port2send, 0))
 
 print "number of packets"+ str(len(pcaps))
-NUM_PACKETS = len(pcaps)
+NtUM_PACKETS = len(pcaps)
 
 delays = PacketDelay(10, 5, 25, 100, NUM_PACKETS)
 
@@ -150,8 +150,8 @@ for d in pcaps:
 #        pkt["TCP"].dport = random.randint(1025, 65535)
 	#send_socket.send(str(pkt))
 	send_socket.send(str(d))
-	#time.sleep(d / 1000.)
-	time.sleep(1/100)
+	time.sleep(d / 1000.)
+	#time.sleep(1)
 print "Sending", NUM_PACKETS, "packets by ", port2send ,"..."
 #time.sleep(2)
 #iface, pkt = queue.get()
@@ -161,7 +161,7 @@ print "Sending", NUM_PACKETS, "packets by ", port2send ,"..."
 #'''
 #'''
 #print "DISTRIBUTION: "
-##print "pkts sent from",port2send,"to", (int(port2send%2)+1)
+#print "pkts sent from",port2send,"to", (int(port2send%2)+1)
 #for p in port_map:
 #	c = ports.count(p)
 #	print "port {}: {:>3} [ {:>5}% ]".format(port_map[p], c, 100. * c / NUM_PACKETS)

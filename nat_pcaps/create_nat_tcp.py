@@ -128,7 +128,10 @@ for i in range(0, 7):
 #pkts.append(Ether(dst=macdst[p],src=macsrc[p])/IP(dst=ipdst[p],src=ipsrc[p])/UDP(dport=10,sport=str(r[p]))/Raw(RandString(size=pktsize[i])))
 #pkts.append(Ether(dst='aa:1b:eb:df:44:3d',src='00:44:00:00:00:00')/IP(dst='4.0.0.11',src='4.0.0.10')/GRE()/IP(dst='192.168.0.10',src='10.0.0.    10')/TCP(sport=20, dport=80)/Raw(RandString(size=pktsize[i])))
 #pkts.append(Ether(dst='aa:1b:eb:df:44:3d',src=macsrc[p])/IP(dst='4.0.0.1',src='4.0.0.10')/GRE()/IP(dst=ipdst[p],src=ipsrc[p])/TCP(sport=20, dport=80)/Raw(RandString(size=pktsize[i])))
-          pkts.append(Ether(dst='aa:1b:eb:df:44:3d',src=macsrc[p])/IP(dst=ipdst[p],src=ipsrc[p])/TCP(sport=r[index], dport=80)/Raw(RandString(size=pktsize[i])))
+          pkts.append(Ether(dst='aa:1b:eb:df:44:3d',src=macsrc[p])
+           /IP(dst=ipdst[p],src=ipsrc[p])
+           /TCP(sport=r[index], dport=80)
+           /Raw(RandString(size=pktsize[i])))
 
    # pkt = Ether(dst='00:aa:bb:00:00:a5',src='00:55:00:00:00:00')/IP(dst='192.168.0.1',src='192.168.0.10')/TCP(sport=81, dport=1025)/"from scapy packet"
 
@@ -136,7 +139,7 @@ for i in range(0, 7):
 	  #Create trace file
 	  if f == 0:
 			#FILE = "echo " + str(ipdst[p]) + " " + macdst_h[p] + " 1 >> PCAP/trace_trPR_ipv4_" + str(entries) + "_random.txt"
-			FILE = "echo " + macsrc_h[p] + " " +  str(ipsrc[p]) + " " + str(ipdst[p])+ " " +str(r[index])+" 1 >> PCAP/trace_trPR_tcp_" + str(entries) + "_random.txt"
+			FILE = "echo " + macsrc_h[p] + " " +  str(ipsrc[p]) + " " + str(ipdst[p])+ " " +str(r[index])+" 1 >> PCAP/trace_nat_up_" + str(entries) + "_random.txt"
 			os.system(FILE)
 			FILE2 = "echo " + macsrc[p] + " 0 >> PCAP/trace_trPR_l2_" + str(entries) + "_random.txt"
 			#os.system(FILE2)

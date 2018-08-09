@@ -138,7 +138,6 @@ for i in range(0, 7):
 
 	  #Create trace file
 	  if f == 0:
-			#FILE = "echo " + str(ipdst[p]) + " " + macdst_h[p] + " 1 >> PCAP/trace_trPR_ipv4_" + str(entries) + "_random.txt"
 			FILE = "echo " + macsrc_h[p] + " " +  str(ipsrc[p]) + " " + str(ipdst[p])+ " " +str(r[index])+" 1 >> PCAP/trace_nat_up_" + str(entries) + "_random.txt"
 			os.system(FILE)
 			FILE2 = "echo " + macsrc[p] + " 0 >> PCAP/trace_trPR_l2_" + str(entries) + "_random.txt"

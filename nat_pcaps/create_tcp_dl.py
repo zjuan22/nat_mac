@@ -128,6 +128,7 @@ for m in range(entries):
 #########
 i = 0
 for i in range(0, 7):
+        print "packet size =" + i
 	p = 0
 	for p in range(0, entries):
 	  index = randint(1,250)
